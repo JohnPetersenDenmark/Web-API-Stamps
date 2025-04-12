@@ -194,7 +194,7 @@ namespace API_upload.Controllers
             return Ok();
         }
 
-
+        //
 
         private Stamp CopyStampDtoToStamp(StampFullDto stampDto, Stamp stamp)
         {
