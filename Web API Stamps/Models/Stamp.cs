@@ -1,4 +1,6 @@
-﻿namespace API_upload.Models
+﻿using Web_API_Stamps.Models;
+
+namespace API_upload.Models
 {
     public class Stamp
     {
@@ -32,6 +34,8 @@
         public string? AdditionalNotes { get; set; }
 
         public string? ThumbnailDataBase64 { get; set; }
+
+        public StampCategory StampCategory { get; set; }  
 
         //public ImageData? ImageData { get; set; }
         //public ThumbnailData? ThumbnailData { get; set; }

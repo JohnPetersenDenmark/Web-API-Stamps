@@ -9,6 +9,8 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System;
+using CustomerWaypointApp.Models;
+using Web_API_Stamps.Models;
 
 namespace API_upload.Controllers
 {
@@ -72,12 +74,14 @@ namespace API_upload.Controllers
                 outputJson.FaceValue = stamp.FaceValue;
                 outputJson.Rarity = stamp.Rarity;
 
+                outputJson.StampCategory = stamp.StampCategory;
+
 
             }
             return Ok(outputJson);
         }
 
-     
+
 
         [HttpGet("stamps")]
         public async Task<IActionResult> GetStamps()
@@ -95,6 +99,7 @@ namespace API_upload.Controllers
                 dto.Country = stamp.Country;
                 dto.CatalogNumber = stamp.CatalogNumber;
                 dto.StampName = stamp.StampName;
+                dto.StampCategory = stamp.StampCategory;
 
                 var thumbnail = thumbnailList.Where(t => stamp.Id == t.StampId).FirstOrDefault();
                 if (thumbnail != null)
@@ -104,12 +109,12 @@ namespace API_upload.Controllers
 
                 returnList.Add(dto);
             }
-      
+
             return Ok(returnList);
         }
 
 
-      
+
 
         private async Task<byte[]> MakeThumbNail(MemoryStream memoryStream)
         {
@@ -156,6 +161,11 @@ namespace API_upload.Controllers
                     };
                     await _context.ThumbnailsData.AddAsync(thumbnailData);
                 }
+
+                if (stampDto.StampCategory != null)
+                {
+                    var stampCategory = stampDto.StampCategory;
+                }
             }
             else
             {
@@ -177,7 +187,7 @@ namespace API_upload.Controllers
                     if (imageData != null)
                     {
                         imageData.FileData = imageBytes;
-                        _context.ImagesData.Update(imageData); 
+                        _context.ImagesData.Update(imageData);
                     }
 
                     var thumbnailData = await _context.ThumbnailsData.FirstOrDefaultAsync(i => i.StampId == stamp.Id);
@@ -202,38 +212,89 @@ namespace API_upload.Controllers
             {
                 stamp = new Stamp();
             }
-          
+
             {
                 stamp.FilePath = stampDto.FilePath;
                 stamp.FileName = stampDto.FileName;
-                 stamp.UploadedAt = DateTime.Now;
+                stamp.UploadedAt = DateTime.Now;
                 //FileData = memoryStream.ToArray();  // Store binary data here
-                 stamp.ContentType = stampDto.ContentType;
+                stamp.ContentType = stampDto.ContentType;
 
-                 stamp.StampName = stampDto.StampName;
-                 stamp.Country = stampDto.Country;
-                 stamp.YearOfIssue = stampDto.YearOfIssue;
-                 stamp.CatalogNumber = stampDto.CatalogNumber;
-
-
-                 stamp.Watermark = stampDto.Watermark;
-                 stamp.Condition = stampDto.Condition;
-                 stamp.Size = stampDto.Size;
-                 stamp.FaceValue = stampDto.FaceValue;
+                stamp.StampName = stampDto.StampName;
+                stamp.Country = stampDto.Country;
+                stamp.YearOfIssue = stampDto.YearOfIssue;
+                stamp.CatalogNumber = stampDto.CatalogNumber;
 
 
-                 stamp.Color = stampDto.Color;
-                 stamp.PrintMethod = stampDto.PrintMethod;
-                 stamp.Rarity = stampDto.Rarity;
-                 stamp.SpecialFeatures = stampDto.SpecialFeatures;
+                stamp.Watermark = stampDto.Watermark;
+                stamp.Condition = stampDto.Condition;
+                stamp.Size = stampDto.Size;
+                stamp.FaceValue = stampDto.FaceValue;
 
 
-                 stamp.StampSeries = stampDto.StampSeries;
-                 stamp.HistoricalSignificance = stampDto.HistoricalSignificance;
-                 stamp.Provenance = stampDto.Provenance;
+                stamp.Color = stampDto.Color;
+                stamp.PrintMethod = stampDto.PrintMethod;
+                stamp.Rarity = stampDto.Rarity;
+                stamp.SpecialFeatures = stampDto.SpecialFeatures;
+
+
+                stamp.StampSeries = stampDto.StampSeries;
+                stamp.HistoricalSignificance = stampDto.HistoricalSignificance;
+                stamp.Provenance = stampDto.Provenance;
                 stamp.AdditionalNotes = stampDto.AdditionalNotes;
-            };       
+
+                stamp.StampCategory = stampDto.StampCategory;
+            }
+            ;
             return stamp;
+        }
+
+        [HttpGet("stampCategories")]
+        public async Task<IActionResult> GetStampCategories()
+        {
+            var categoryList = await _context.Categories.ToListAsync();
+            var thumbnailList = await _context.ThumbnailsData.ToListAsync();
+
+            var returnList = new List<StampCategoryDto>();
+
+            foreach (var category in categoryList)
+            {
+                var dto = new StampCategoryDto();
+                dto.Id = category.Id;
+                dto.Category = category.Category;
+
+                returnList.Add(dto);
+            }
+
+            return Ok(returnList);
+        }
+
+        [HttpPost("uploadStampCategory")]
+        public async Task<IActionResult> UploadStampCategory([FromBody] StampCategoryDto categoryDto)
+        {
+            if (categoryDto.Id == 0)
+            {
+               
+                var category = new StampCategory(); 
+                category.Id = categoryDto.Id;
+                category.Category = categoryDto.Category;
+
+                await _context.Categories.AddAsync(category);                          
+            }
+            else
+            {
+                // 🔄 Updating an existing stamp
+                var existingCategory = await _context.Categories.FindAsync(categoryDto.Id);
+                if (existingCategory == null)
+                    return NotFound($"Stamp with ID {categoryDto.Id} not found.");
+
+                existingCategory.Category = categoryDto.Category;
+
+                _context.Categories.Update(existingCategory);
+            }
+
+            await _context.SaveChangesAsync(); // ✅ Save here to get the generated Stamp.Id     
+            return Ok();
         }
     }
 }

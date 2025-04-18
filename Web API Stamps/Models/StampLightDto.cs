@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Web_API_Stamps.Models;
 
 namespace API_upload.Models
 {
@@ -20,6 +21,9 @@ namespace API_upload.Models
 
         [JsonPropertyName("catalogNumber")]
         public string CatalogNumber { get; set; }
+
+        [JsonPropertyName("stampCategory")]
+        public StampCategory StampCategory { get; set; }
 
     }
 }
