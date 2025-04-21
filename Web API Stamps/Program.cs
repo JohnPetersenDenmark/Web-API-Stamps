@@ -13,7 +13,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-//builder.WebHost.UseUrls("http://192.168.64.1:5057");
+//builder.WebHost.UseUrls("http://192.168.8.105:5057");
 
 var app = builder.Build();
 

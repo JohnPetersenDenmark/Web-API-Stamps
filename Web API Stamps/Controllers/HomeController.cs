@@ -74,7 +74,14 @@ namespace API_upload.Controllers
                 outputJson.FaceValue = stamp.FaceValue;
                 outputJson.Rarity = stamp.Rarity;
 
-                outputJson.StampCategory = stamp.StampCategory;
+                if (stamp.StampCategory != null)
+                {
+                    var stampCategoryDto = new StampCategoryDto();
+                    stampCategoryDto.Category = stamp.StampCategory.Category;
+                    stampCategoryDto.Id = stamp.StampCategory.Id;
+                    outputJson.StampCategory = stampCategoryDto;
+                }
+                
 
 
             }
@@ -243,7 +250,13 @@ namespace API_upload.Controllers
                 stamp.Provenance = stampDto.Provenance;
                 stamp.AdditionalNotes = stampDto.AdditionalNotes;
 
-                stamp.StampCategory = stampDto.StampCategory;
+               if (stampDto.StampCategory != null)
+                {
+                    var stampCategory = new StampCategory();
+                    stampCategory.Id  = stampDto.StampCategory.Id;
+                    stampCategory.Category = stampDto.StampCategory.Category;
+                    stamp.StampCategory = stampCategory;
+                }
             }
             ;
             return stamp;

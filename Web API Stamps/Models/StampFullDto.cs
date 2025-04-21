@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using CustomerWaypointApp.Models;
+using System.Text.Json.Serialization;
 using Web_API_Stamps.Models;
 
 namespace API_upload.Models
@@ -72,6 +73,6 @@ namespace API_upload.Models
         public string? AdditionalNotes { get; set; }
 
         [JsonPropertyName("stampCategory")]
-        public StampCategory StampCategory { get; set; }
+        public StampCategoryDto StampCategory { get; set; }
     }
 }
